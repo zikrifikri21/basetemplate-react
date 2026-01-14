@@ -5,8 +5,6 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
-
 
 const appName = import.meta.env.VITE_APP_NAME || 'BaseTemplate';
 
@@ -19,13 +17,10 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
-        const siteKey = props.initialPage.props.config.recaptcha_site_key;
 
         root.render(
             <StrictMode>
-                <GoogleReCaptchaProvider reCaptchaKey={siteKey}>
-                    <App {...props} />
-                </GoogleReCaptchaProvider>
+                <App {...props} />
             </StrictMode>,
         );
     },

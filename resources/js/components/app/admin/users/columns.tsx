@@ -1,0 +1,79 @@
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { ColumnDef } from '@tanstack/react-table';
+import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
+
+export type User = {
+    id: number;
+    name: string;
+    email: string;
+    roles: { name: string }[];
+    created_at: string;
+};
+
+export const getColumns = (
+    onEdit: (user: User) => void,
+    onDelete: (id: number) => void,
+): ColumnDef<User>[] => [
+    {
+        accessorKey: 'name',
+        header: 'Name',
+        cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>,
+    },
+    {
+        accessorKey: 'email',
+        header: 'Email',
+    },
+    {
+        id: 'roles',
+        header: 'Role',
+        cell: ({ row }) => {
+            const roles = row.original.roles;
+            return (
+                <div className="flex gap-1">
+                    {roles.map((role) => (
+                        <Badge key={role.name} variant="secondary" className="capitalize">
+                            {role.name}
+                        </Badge>
+                    ))}
+                </div>
+            );
+        },
+    },
+    {
+        id: 'actions',
+        cell: ({ row }) => {
+            const user = row.original;
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => onEdit(user)}>
+                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => onDelete(user.id)}
+                            className="text-red-600 focus:text-red-600"
+                        >
+                            <Trash className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
+        },
+    },
+];

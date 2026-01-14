@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'menus' => fn() => $request->user() ? \App\Services\NavService::getSidebar() : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'config' => [
                 'recaptcha_site_key' => config('services.recaptcha.site_key'),

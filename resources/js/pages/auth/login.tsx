@@ -18,12 +18,13 @@ interface LoginProps {
     canRegister: boolean;
 }
 
-export default function Login({
+function Login({
     status,
     canResetPassword,
     canRegister,
 }: LoginProps) {
     const { executeRecaptcha } = useGoogleReCaptcha();
+
     const form = useForm({
         email: '',
         password: '',
@@ -42,7 +43,10 @@ export default function Login({
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
 
-        if (!executeRecaptcha) return;
+        if (!executeRecaptcha) {
+            console.warn('reCAPTCHA not ready');
+            return;
+        }
 
         const token = await executeRecaptcha('login');
 
@@ -61,10 +65,7 @@ export default function Login({
     };
 
     return (
-        <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
-        >
+        <>
             <Head title="Log in" />
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -74,14 +75,13 @@ export default function Login({
                         <Input
                             id="email"
                             type="email"
-                            name="email"
                             value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
+                            onChange={(e) =>
+                                setData('email', e.target.value)
+                            }
                             required
                             autoFocus
-                            tabIndex={1}
                             autoComplete="email"
-                            placeholder="email@example.com"
                         />
                         <InputError message={errors.email} />
                     </div>
@@ -93,7 +93,6 @@ export default function Login({
                                 <TextLink
                                     href={request()}
                                     className="ml-auto text-sm"
-                                    tabIndex={5}
                                 >
                                     Forgot password?
                                 </TextLink>
@@ -102,30 +101,24 @@ export default function Login({
                         <Input
                             id="password"
                             type="password"
-                            name="password"
                             value={data.password}
                             onChange={(e) =>
                                 setData('password', e.target.value)
                             }
                             required
-                            tabIndex={2}
                             autoComplete="current-password"
-                            placeholder="Password"
                         />
                         <InputError message={errors.password} />
                     </div>
 
                     <div className="flex items-center space-x-3">
                         <Checkbox
-                            id="remember"
-                            name="remember"
-                            tabIndex={3}
                             checked={data.remember}
                             onCheckedChange={(checked) =>
                                 setData('remember', !!checked)
                             }
                         />
-                        <Label htmlFor="remember">Remember me</Label>
+                        <Label>Remember me</Label>
                     </div>
 
                     {errors.recaptcha_token && (
@@ -137,9 +130,7 @@ export default function Login({
                     <Button
                         type="submit"
                         className="mt-4 w-full"
-                        tabIndex={4}
                         disabled={processing}
-                        data-test="login-button"
                     >
                         {processing && <Spinner className="mr-2" />}
                         Log in
@@ -149,18 +140,29 @@ export default function Login({
                 {canRegister && (
                     <div className="text-center text-sm text-muted-foreground">
                         Don't have an account?{' '}
-                        <TextLink href={register()} tabIndex={5}>
+                        <TextLink href={register()}>
                             Sign up
                         </TextLink>
                     </div>
                 )}
-            </form>
 
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
-        </AuthLayout>
+                {status && (
+                    <div className="text-center text-sm font-medium text-green-600">
+                        {status}
+                    </div>
+                )}
+            </form>
+        </>
     );
 }
+
+Login.layout = (page: React.ReactNode) => (
+    <AuthLayout
+        title="Log in to your account"
+        description="Enter your email and password below to log in"
+    >
+        {page}
+    </AuthLayout>
+);
+
+export default Login;
