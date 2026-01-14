@@ -50,5 +50,15 @@ class NavItemSeeder extends Seeder
             'is_active'       => true,
             'permission_name' => 'manage_users',
         ]);
+
+        NavItem::create([
+            'parent_id'       => $systemMenu->id,
+            'title'           => 'Roles',
+            'url'             => '/admin/roles',
+            'icon'            => 'ShieldCheck',
+            'order'           => 3,
+            'is_active'       => true,
+            'permission_name' => 'manage_system',
+        ]);
     }
 }
